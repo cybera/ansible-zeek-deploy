@@ -1,0 +1,56 @@
+- name: Build Zeek Standalone Sample
+  hosts:
+    - zeek-instance
+  become: true
+  tasks:
+
+    - name: Manage Apt Cache and Packages
+      apt:
+        name: python3, python3-pip, python3-dev, python3-git, gdb, curl, wget
+        state: present
+        update_cache: yes
+
+    - name: Set /etc/environment file
+      lineinfile:
+        path: /etc/environment
+        regexp: '^PATH=.*'
+        line: 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/zeek/bin"'
+
+    - name: Manage Zeek APT Key
+      apt_key:
+        url: https://download.opensuse.org/repositories/security:zeek/xUbuntu_22.04/Release.key
+
+    - name: Manage Zeek APT Repo
+      apt_repository:
+        repo: deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_22.04/ /
+        state: present
+
+    - name: Manage Zeek
+      apt:
+        name: zeek
+        update_cache: yes
+
+    - name: Ensure Zeek package manager installed
+      pip:
+        name: zkg
+        state: present
+        executable: pip3
+
+    - name: Manage node.cfg file
+      copy:
+        src: "/home/ubuntu/ansible-zeek-deploy/plays/files/zeek/node.cfg"
+        dest: "/opt/zeek/etc/node.cfg"
+        owner: root
+        group: zeek
+        mode: 0640
+
+    - name: Deploy Zeek
+      command: /opt/zeek/bin/zeekctl deploy
+
+    - name: Setup Zeek cron
+      cron:
+        name: zeek cron
+        minute: "*/5"
+        job: "/opt/zeek/bin/zeekctl cron"
+        cron_file: zeek_cron
+        user: root

@@ -1,0 +1,25 @@
+- name: Configure Zeek Standalone Sample
+  hosts:
+    - zeek-instance
+  become: true
+  tasks:
+
+    - name: Ensure Zeek package manager installed
+      pip:
+        name: zkg
+        state: present
+        executable: pip3
+
+    - name: Configure Zeek package manager
+      command: /opt/zeek/bin/zkg autoconfig
+
+    - name: Install Zeek packages
+      command: 
+        cmd: zkg install --force {{ item }}
+        creates: /opt/zeek/lib/zeek/plugins/packages/ {{ item }}
+      loop: 
+        - "cybera/zeek-sniffpass"
+          # Additional Zeek modules can be added here
+
+    - name: Clean Restart Zeek
+      command: /opt/zeek/bin/zeekctl restart --clean

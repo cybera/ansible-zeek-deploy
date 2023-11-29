@@ -1,0 +1,31 @@
+- name: Teardown Zeek Standalone Example
+  hosts:
+    - zeek-instance
+  become: true
+  tasks:
+
+    - name: Shutdown Zeek
+      command: /opt/zeek/bin/zeekctl stop
+
+    - name: Remove zkg modules
+      command: /opt/zeek/bin/zkg purge --force
+
+    - name: Cooldown period
+      pause: 
+        seconds: 10 
+
+    - name: Manage Apt Cache and Packages
+      apt:
+        name: zeek
+        state: absent
+        update_cache: yes
+
+    - name: Manage Apt autoremove
+      apt:
+        autoremove: yes
+
+    - name: Remove Zeek cron files from under /etc/cron.d
+      cron:
+        name: zeek cron
+        cron_file: zeek_cron
+        state: absent
