@@ -1,10 +1,6 @@
 # Ansible Zeek Deployment
 This is a small example of automating, or mostly automating, a Zeek deployment from one virtual machine onto another virtual machine. Not for Production. Refer to **Setup** for recommended deployment. The included playbooks will install an Ubuntu 22.04 compatible binary of Zeek, in addition to a few third party Zeek modules. The following modules are included:
- - https://github.com/pgaulon/zeek-notice-slack
- - https://github.com/srozb/dns_axfr
  - https://github.com/cybera/zeek-sniffpass
- - https://github.com/mitre-attack/bzar
- - https://github.com/corelight/detect-ransomware-filenames
 ## Setup
 Recommended testing environment:
 - One virtual machine to install Ansible and deploy the playbooks from; will be referred to as the `ansible-controller`.
